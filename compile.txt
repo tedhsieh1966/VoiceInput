@@ -1,0 +1,7 @@
+在根目录中运行
+pip install -r requirements.txt
+python build.py
+
+在install目录中运行
+pip install -r requirements.txt
+python build.py

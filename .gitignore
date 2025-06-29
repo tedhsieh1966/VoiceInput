@@ -1,0 +1,13 @@
+# 忽略所有 .exe 文件
+*.exe
+
+# 忽略所有二進位文件（可選）
+*.bin
+*.dll
+*.so
+*.dylib
+
+# 忽略 build 文件夾（可選）
+/build/
+/dist/
+/bin/
