@@ -33,6 +33,7 @@ def build_installer():
         '--add-data=src/listen_128.png;.',
         '--add-data=src/no_listen_128.png;.',
         '--add-data=src/languages.xlsx;.',
+       # '--add-data=src/config.json;.',
        # '--distpath=dist',
        # '--workpath=build',
        # '--specpath=build'

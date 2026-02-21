@@ -1,0 +1,23 @@
+[project]
+name = "voiceinput"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "openpyxl",
+    "pandas",
+    "pystray",
+ "psutil",
+      "Pillow",
+      "SpeechRecognition",
+  #    "py_libraries",
+    "PyAudio",
+    "PyInstaller",
+    "pywin32",
+    "keyboard"
+]
+
+[tool.uv.sources]
+# 這裡的路徑是相對於 pyproject.toml 所在的專案根目錄
+#py_libraries = { path = "../../Library/python/py_libraries", editable = true }

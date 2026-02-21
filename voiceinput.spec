@@ -5,7 +5,7 @@ a = Analysis(
     ['src\\VoiceInput.py'],
     pathex=[],
     binaries=[],
-    datas=[('src/listen_128.png', '.'), ('src/no_listen_128.png', '.'), ('src/languages.xlsx', '.')],
+    datas=[('src/listen_128.png', '.'), ('src/no_listen_128.png', '.'), ('src/languages.xlsx', '.'), ('src/config.json', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

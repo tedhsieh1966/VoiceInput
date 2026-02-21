@@ -13,8 +13,11 @@ import psutil
 import pystray
 from PIL import Image, ImageDraw
 from typing import List,  Optional, Any
-#from my_library.FileOp import get_full_path
-from my_library.LanguageOp import *
+#from py_library.FileOp import get_full_path
+#from py_libraries.LanguageOp import *
+#sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'lib'))
+from LanguageOp import *
+from config import ConfigManager
 
 
 PHRASE_TIME_LENGTH=10
@@ -37,7 +40,12 @@ def get_full_path(relative_path):
         return None
 
 translator = LanguageTranslator(get_full_path("languages.xlsx"))
-my_language = "zh-TW"
+sys_lang = get_current_input_language().get("iso_code")
+if sys_lang in translator.get_languages():
+    my_language = sys_lang
+else:
+    my_language = translator.get_languages()[0]
+#my_language = "zh-TW"
 
 
 def translate(text):
@@ -76,23 +84,11 @@ except Exception as e:
     sys.exit(1)
 
 
-def init_settings():
-        settings = Settings()
-        my_language = settings.get("language")
 
-        if not my_language:
-            sys_lang = get_current_input_language()
-            sys_iso_lang = sys_lang.get("iso_language")
-            if sys_iso_lang in translator.get_languages():
-                my_language = sys_iso_lang
-            else:
-                my_language = translator.get_languages()[0]
-
-        settings.set("language", my_language)
 
 class VoiceInput:
     def __init__(self):
-        init_settings()
+
         self.recognizer = sr.Recognizer()
         #self.microphone = None
         self.is_listening = False
@@ -103,16 +99,15 @@ class VoiceInput:
         self.running = True
 
         self.tray_icon = None
-        #self._init_settings()
         # 加载图标图像
         self.listen_image = self._load_image("listen_128.png")
         self.no_listen_image = self._load_image("no_listen_128.png")
         self.default_image = self._load_image("no_listen_128.png")  # 默认使用 no_listen 图标
+        self.config_mgr = ConfigManager()
         self.setup()
         self.status_thread = threading.Thread(target=self._status_manager, daemon=True)
         self.status_thread.start()
-        print("連續語音輸入程式已啟動，使用 Ctrl+Shift+L 切換錄音狀態")
-
+        print("連續語音輸入程式已啟動")
 
 
 
@@ -306,7 +301,9 @@ class VoiceInput:
             #self._create_icon("就緒", "gray"),
             self.default_image,  # 使用加载的图像
             translate("voice_input_tool"),
+          #  action=self.toggle_listening,
             menu=pystray.Menu(
+                pystray.MenuItem(translate("toggle"), self.toggle_listening),
                 pystray.MenuItem(translate("calib_microphone"), self.calibrate_mic),
                 pystray.MenuItem(translate("exit"), self.quit_app)
             )
@@ -363,9 +360,10 @@ class VoiceInput:
 
     def run(self):
         # 註冊全局快捷鍵
-        keyboard.add_hotkey('ctrl+shift+v', self.toggle_listening)
+        hot_key = self.config_mgr.get_hot_key()
+        keyboard.add_hotkey(hot_key, self.toggle_listening)
 
-        print("程式運行中，按 Ctrl+Shift+V 開始/停止語音輸入")
+        print(f"程式運行中，按 {hot_key} 開始/停止語音輸入")
         print("按 Ctrl+C 退出程式")
 
         try:
@@ -434,74 +432,7 @@ def send_text_via_clipboard(text):
         print(f"剪贴板方法失败: {str(e)}")
         return False
 
-class Settings:
-    def __init__(self, file_path: str = "settings.json"):
-        """
-        初始化設定類
-        :param file_path: 設定檔路徑 (預設為 settings.json)
-        """
-        self.file_path = file_path
-        self.settings={}
-        self._load()
 
-    def _load(self) -> None:
-        """從檔案載入設定"""
-        try:
-            if os.path.exists(self.file_path):
-                with open(self.file_path, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    if "settings" in data:
-                        self.settings = data['settings']
-
-
-        except (json.JSONDecodeError, IOError) as e:
-            print(f"載入設定檔失敗: {e}")
-            self.settings = {}
-
-    def save(self) -> None:
-        data={"settings":self.settings,
-          }
-        """儲存設定到檔案"""
-        try:
-            # 確保目錄存在
-            file_path = Path(self.file_path)
-            file_path.parent.mkdir(parents=True, exist_ok=True)
-
-            with open(self.file_path, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=4, ensure_ascii=False)
-        except IOError as e:
-            print(f"儲存設定檔失敗: {e}")
-
-    def get(self, key: str, default: Optional[Any] = None) -> Any:
-        """
-        獲取設定值
-        :param key: 設定鍵
-        :param default: 如果鍵不存在時返回的預設值
-        :return: 設定值或預設值
-        """
-        return self.settings.get(key, default)
-
-    def set(self, key: str, value: Any) -> None:
-        """
-        設定值並立即保存
-        :param key: 設定鍵
-        :param value: 要設定的值
-        """
-        self.settings[key] = value
-        self.save()
-
-    def remove(self, key: str) -> None:
-        """
-        移除設定並立即保存
-        :param key: 要移除的設定鍵
-        """
-        if key in self.settings:
-            del self.settings[key]
-            self.save()
-
-    def get_all(self) -> dict:
-        """獲取所有設定"""
-        return self.settings.copy()
 
 
 

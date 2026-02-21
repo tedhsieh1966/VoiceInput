@@ -7,7 +7,7 @@ import ctypes
 from pathlib import Path
 import tkinter as tk
 from tkinter import messagebox, ttk
-from my_library.LanguageOp import *
+from py_libraries.LanguageOp import *
 
 def get_full_path(relative_path):
     """获取资源的绝对路径"""
@@ -36,7 +36,7 @@ def show_error_dialog(title, message):
 class VoiceInputInstaller:
     def __init__(self):
         self.translator = LanguageTranslator(get_full_path("languages.xlsx"))
-        sys_lang = get_current_input_language().get("iso_language")
+        sys_lang = get_current_input_language().get("iso_code")
         if sys_lang in self.translator.get_languages():
             self.my_language = sys_lang
         else:
@@ -134,13 +134,14 @@ class VoiceInputInstaller:
 
             # 复制主程序
             dest_path = install_dir / "voiceinput.exe"
-            shutil.copy(exe_path, dest_path)
-            self.progress["value"] = 40
+           # shutil.copy(exe_path, dest_path)
+           # shutil.copy(source_dir / "config.json", install_dir)
+           # self.progress["value"] = 40
 
             # 复制图标文件
-            shutil.copy(source_dir / "listen_128.png", install_dir)
-            shutil.copy(source_dir / "no_listen_128.png", install_dir)
-            self.progress["value"] = 60
+           # shutil.copy(source_dir / "listen_128.png", install_dir)
+           # shutil.copy(source_dir / "no_listen_128.png", install_dir)
+           # self.progress["value"] = 60
 
             # 创建桌面快捷方式
             if self.create_shortcut_var.get():
